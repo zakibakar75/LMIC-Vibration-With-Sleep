@@ -62,19 +62,19 @@ int count=0;
 /* LoRaWAN NwkSKey, network session key
    This is the default Semtech key, which is used by the prototype TTN
    network initially. */
-static const PROGMEM u1_t NWKSKEY[16] = { 0xXX, 0xYY, 0xZZ, 0xB9, 0x23, 0xE6, 0x84, 0x3B, 0x8E, 0xA0, 0x95, 0xEF, 0x08, 0x40, 0xB8, 0x94 };
-/*Eg : XXYYZZB923E6843B8EA095EF0840B894 as got from TTN dashboard*/
+static const PROGMEM u1_t NWKSKEY[16] = { 0xD2, 0x9E, 0xA7, 0x33, 0xC5, 0xC5, 0xFF, 0x7A, 0xCE, 0x85, 0xFC, 0x5F, 0x62, 0xAA, 0xBB, 0x5D };
+/*Eg : D29EA733C5C5FF7ACE85FC5F62AABB5D as got from TTN dashboard*/
 
 /* LoRaWAN AppSKey, application session key
    This is the default Semtech key, which is used by the prototype TTN
    network initially. */
-static const u1_t PROGMEM APPSKEY[16] = { 0xXX, 0xYY, 0xZZ, 0xCC, 0x31, 0x37, 0x27, 0x9B, 0x99, 0x11, 0xE3, 0x94, 0x3A, 0xCA, 0xE2, 0x50 };
-/*Eg : XXYYZZCC3137279B9911E3943ACAE250 as got from TTN dashboard */
+static const u1_t PROGMEM APPSKEY[16] = { 0xD0, 0xF1, 0x30, 0xAC, 0xC7, 0x33, 0x06, 0xB1, 0xF6, 0x7A, 0xBF, 0x92, 0xEF, 0x1A, 0xCD, 0x0F };
+/*Eg : D0F130ACC73306B1F67ABF92EF1ACD0F as got from TTN dashboard */
 
 /* LoRaWAN end-device address (DevAddr)
    See http://thethingsnetwork.org/wiki/AddressSpace */
-static const u4_t DEVADDR = 0xXXYYZZE7 ; // <-- Change this address for every node!
-/*Eg : XXYYZZ17 as got from TTN dashboard */
+static const u4_t DEVADDR = 0x260219FF ; // <-- Change this address for every node!
+/*Eg : 260219FF as got from TTN dashboard */
 
 /* These callbacks are only used in over-the-air activation, so they are
    left empty here (we cannot leave them out completely unless
@@ -177,17 +177,29 @@ void do_send(osjob_t* j){
         Serial.println(F("OP_TXRXPEND, not sending"));
     } else {
         /* Prepare upstream data transmission at the next possible time. */
-        
-        // Transmit 2 times (10s interval) everytime wakes up
+
         count++;
         Serial.println(" ");   
-        if(count > 2)
+        if(count > 10)
         {
            count = 1;
            delay(2000);
-           LMIC_setSleep();  // New function created in the library
+           LMIC_setSleep();
            sleepNow();     // sleep function called here
         }  
+
+
+        /****** Send "Hello, Mine is ABP" ******/
+        //LMIC_setTxData2(1, mydata, sizeof(mydata)-1, 0);
+        /**************************************/
+        
+        /******* Proximity Sensor *************/
+        //Serial.print("\nDistance: ");
+        //uint8_t Distance = sonar.ping_cm();
+        //Serial.print(Distance);
+        //Serial.println("cm");
+        //message[0] = Distance;
+        /**************************************/
         
         /******* Voltage Sensor ***************/
         averageVcc = averageVcc + (float) readVcc();
@@ -201,7 +213,7 @@ void do_send(osjob_t* j){
         LMIC_setTxData2(1, message, sizeof(message), 0);        
         Serial.println(F("Packet queued"));
         /*Print Freq being used*/
-        Serial.println(LMIC.freq);
+        Serial.print("Transmit on Channel : ");Serial.println(LMIC.txChnl);
         /*Print mV being supplied*/
         
         delay(1000);
@@ -249,7 +261,7 @@ void sleepNow() {
     // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP  
     sleep_disable();         // first thing after waking from sleep: disable sleep...  
     detachInterrupt(1);      // disables interrupt 1 on pin 3 so the wakeUpNow code will not be executed during normal running time. 
-    LMIC_setStandby();  //new function created in the library
+    LMIC_setStandby();
     LoraInitialization();
 }  
 
@@ -290,8 +302,10 @@ void LoraInitialization(){
 
     /* Set data rate and transmit power (note: txpow seems to be ignored by the library) */
     //LMIC_setDrTxpow(DR_SF7,14); 
-    LMIC_setDrTxpow(DR_SF10,20);  //lowest Datarate possible in 915MHz region
-
+    LMIC_setDrTxpow(DR_SF12,20);  //lowest Datarate possible in 915MHz region
+    
+    /* Start job */
+    //do_send(&sendjob);
 }
 
 

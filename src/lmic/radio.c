@@ -313,11 +313,13 @@ static void opmodeFSK() {
     writeReg(RegOpMode, u);
 }
 
+//Zaki, added to make the RFM95 sleep
 void opmodeSleep() {
 	
     writeReg(RegOpMode, OPMODE_SLEEP);    // LoRa sleep mode_
 }
 
+//Zaki, added to make the RFM95 wakeup
 void opmodeStandby() {
 
 	writeReg(RegOpMode, OPMODE_STANDBY);

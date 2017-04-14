@@ -6,7 +6,11 @@
 // compiler commandline, use this file instead.
 
 //#define CFG_eu868 1
-#define CFG_us915 1
+//#define CFG_us915 1
+
+#define CFG_as923 1
+//#define AS923_WITH_CAP 1   //uncomment this to enable Tx Capping to Duty Cycle. Look at lmic.c, function nextTx.
+
 // This is the SX1272/SX1273 radio, which is also used on the HopeRF
 // RFM92 boards.
 //#define CFG_sx1272_radio 1
@@ -25,7 +29,7 @@
 // enable more verbose output. Make sure that printf is actually
 // configured (e.g. on AVR it is not by default), otherwise using it can
 // cause crashing.
-#define LMIC_DEBUG_LEVEL 0
+#define LMIC_DEBUG_LEVEL 1
 
 // Enable this to allow using printf() to print to the given serial port
 // (or any other Print object). This can be easy for debugging. The
